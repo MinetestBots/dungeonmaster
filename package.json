@@ -1,11 +1,11 @@
 {
-	"name": "dungeonbot",
-	"version": "0.1.0",
-	"description": "",
-	"main": "bot.js",
-	"author": "MinetestBots",
-	"license": "MIT",
-	"dependencies": {
-		"discord.js": "^12.5.3"
-	}
+    "name": "dungeonbot",
+    "version": "0.1.0",
+    "description": "",
+    "main": "bot.js",
+    "author": "MinetestBots",
+    "license": "MIT",
+    "dependencies": {
+        "discord.js": "^12.5.3"
+    }
 }

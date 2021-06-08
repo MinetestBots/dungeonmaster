@@ -1,7 +1,7 @@
 {
-	"prefix": "!", // Required
-	"token": "ABCDEFGHIJKLMNOPQRSTUVWXYZ.1234567890", // Required
-	"ban_patterns": [ // Optional, no default
-		"some_name\\d\\d" // Will be converted to regex (case-insensitive)
-	]
+    "prefix": "!", // Required
+    "token": "ABCDEFGHIJKLMNOPQRSTUVWXYZ.1234567890", // Required
+    "ban_patterns": [ // Optional, no default
+        "some_name\\d\\d" // Will be converted to regex (case-insensitive)
+    ]
 }

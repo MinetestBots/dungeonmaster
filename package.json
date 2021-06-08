@@ -2,7 +2,7 @@
 	"name": "dungeonbot",
 	"version": "0.1.0",
 	"description": "",
-	"main": "dungeonbot.js",
+	"main": "bot.js",
 	"author": "MinetestBots",
 	"license": "MIT",
 	"dependencies": {

@@ -5,6 +5,8 @@ const {ban_patterns, token} = require("./config.json");
 
 client.once("ready", () => {
     console.log(`Logged in as ${client.user.tag}.`);
+
+    client.user.setActivity("with fire.", {type: "PLAYING"});
 });
 
 client.on("guildMemberAdd", member => {

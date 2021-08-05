@@ -5,6 +5,6 @@
         "some_name\\d\\d" // Will be converted to regex (case-insensitive)
     ],
     "join_message": "<@$ID> has arrived.", // Optional. Valid substitutions: $ID, $NICKNAME, $USERNAME, $TAG
-    "leave_message": "Goodbye, <@$ID>.", // Optional (see above)
+    "leave_message": "Goodbye, **$TAG**.", // Optional (see above)
     "system_channel": "531580498263408671" // Channel ID in which to send join and leave messages. Valid text channel required if using system messages.
 }

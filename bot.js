@@ -1,5 +1,8 @@
 const Discord = require("discord.js");
-const client = new Discord.Client();
+const client = new Discord.Client({
+    intents: ["GUILDS", "GUILD_MEMBERS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS"],
+    partials: ["GUILD_MEMBER", "MESSAGE", "REACTION"],
+});
 
 const config = require("./config.json");
 

@@ -18,6 +18,7 @@ function sendSystemMessage(template, member) {
     const channel = member.guild.channels.resolve(config.system_channel);
     if (channel && channel.type == "text") {
         channel.send(template
+						.replace("$ID", member.id)
                         .replace("$NICKNAME", member.nickname)
                         .replace("$USERNAME", member.user.username)
                         .replace("$TAG", member.user.tag)

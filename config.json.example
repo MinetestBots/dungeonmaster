@@ -1,10 +1,16 @@
 {
-    "prefix": "!", // Required
-    "token": "ABCDEFGHIJKLMNOPQRSTUVWXYZ.1234567890", // Required
-    "ban_patterns": [ // Optional, no default
-        "some_name\\d\\d" // Will be converted to regex (case-insensitive)
-    ],
-    "join_message": "<@$ID> has arrived.", // Optional. Valid substitutions: $ID, $NICKNAME, $USERNAME, $TAG
-    "leave_message": "Goodbye, **$TAG**.", // Optional (see above)
-    "system_channel": "531580498263408671" // Channel ID in which to send join and leave messages. Valid text channel required if using system messages.
+    "token": "ABCDEFGHIJKLMNOPQRSTUVWXYZ.1234567890", // Bot token (required)
+    "module_gateway": { // Config for gateway module
+        "channel": "531580498263408671" // Text channel ID to send join and leave messages (required)
+        "ban_patterns": [ // Case-insensitive regex patterns to automatically ban upon join (optional)
+            "some_name\\d\\d"
+        ],
+        "join_message": "<@$ID> has arrived.", // Join message template (optional), variables: $ID, $NICKNAME, $USERNAME, $TAG
+        "leave_message": "Goodbye, **$USERNAME**.", // Leave message template (optional), see above
+        "nevermind_timeout": 180, // Duration in seconds to consider a member "recently joined" to send a response after leaving (default 0, disabled)
+        "nevermind_messages": [ // List of messages to send when a member leaves shortly after joining (supports variables)
+            "https://tenor.com/view/the-simpsons-bart-simpson-whoops-go-in-and-out-gif-15009786",
+            "$USERNAME didn't last long..."
+        ]
+    }
 }

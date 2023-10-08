@@ -1,56 +1,86 @@
-const Discord = require("discord.js");
-const client = new Discord.Client({
-    intents: ["GUILDS", "GUILD_MEMBERS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS"],
-    partials: ["GUILD_MEMBER", "MESSAGE", "REACTION"],
+const {Client, Collection, Events, GatewayIntentBits, Partials, REST, Routes} = require("discord.js");
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMessageReactions
+    ],
+    partials: [Partials.GuildMember, Partials.Message, Partials.Reaction],
 });
 
 const config = require("./config.json");
 
-client.once("ready", () => {
-    console.log(`Logged in as ${client.user.tag}.`);
+// Load modules
+const fs = require("node:fs");
+const path = require("node:path");
 
-    client.user.setActivity("with fire.", {type: "PLAYING"});
-});
+client.commands = new Collection();
 
-let just_joined = {};
+const registry = [];
+const do_register = process.argv.includes("--register");
 
-function sendSystemMessage(template, member) {
-    const channel = member.guild.channels.resolve(config.system_channel);
-    if (channel && channel.type == "text") {
-        channel.send(template
-						.replace("$ID", member.id)
-                        .replace("$NICKNAME", member.nickname)
-                        .replace("$USERNAME", member.user.username)
-                        .replace("$TAG", member.user.tag)
-        );
-    }
-}
+const modulesPath = path.join(__dirname, "modules");
 
-client.on("guildMemberAdd", member => {
-    for (pattern of config.ban_patterns) {
-        if (member.user.username.toLowerCase().match(new RegExp(pattern, "i"))) {
-            member.ban({reason: "Pattern ban."});
-            return;
+// Load all modules in path
+for (const file of fs.readdirSync(modulesPath).filter(file => file.endsWith(".js"))) {
+    const exports = require(path.join(modulesPath, file))(client);
+
+    if (exports) {
+        if ("commands" in exports) {
+            for (const command of exports.commands) {
+                client.commands.set(command[0].name, command[1]);
+                if (do_register) registry.push(command[0].toJSON());
+            }
         }
     }
 
-    if (config.join_message) sendSystemMessage(config.join_message, member);
+    console.log(`Loaded ${file}`);
+}
 
-    // Hard coding all of this because I am lazy.
-    just_joined[member.id] = true;
-    setTimeout(() => {delete just_joined[member.id]}, 60 * 1000);
-});
-
-const gifs = [
-    "https://tenor.com/view/the-simpsons-bart-simpson-whoops-go-in-and-out-gif-15009786",
-    "https://tenor.com/view/the-simpsons-homer-simpson-bush-hide-im-out-gif-17449504",
-    "https://tenor.com/view/oh-no-top-gear-jeremy-clarkson-no-one-cares-gif-18925814",
-    "https://tenor.com/view/mouse-walkout-hi-there-bye-gif-14078209",
-];
-
-client.on("guildMemberRemove", member => {
-    if (config.leave_message) sendSystemMessage(config.leave_message, member);
-    if (just_joined[member.id]) sendSystemMessage(gifs[~~(Math.random() * gifs.length)], member);
+// Listen for and respond to chat and context menu commands
+client.on(Events.InteractionCreate, async interaction => {
+    if (interaction.isChatInputCommand() || interaction.isMessageContextMenuCommand()) {
+        const command = interaction.client.commands.get(interaction.commandName);
+        if (command) {
+            try {
+                await command(interaction);
+            } catch (error) {
+                console.error(error);
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.followUp({
+                        content: ":exclamation: An error occured while executing this command.",
+                        ephemeral: true,
+                    });
+                } else {
+                    await interaction.reply({
+                        content: ":exclamation: An error occured while executing this command.",
+                        ephemeral: true,
+                    });
+                }
+            }
+        };
+    }
 });
 
 client.login(config.token);
+
+client.once("ready", () => {
+    console.log(`Logged in as ${client.user.tag}.`);
+    client.user.setActivity("with fire.", {type: "PLAYING"});
+
+    // Register bot commands
+    if (do_register) {
+        const rest = new REST().setToken(config.token);
+
+        (async () => {
+            try {
+                process.stdout.write(`Registering ${registry.length} application (/) commands...`)
+                const res = await rest.put(Routes.applicationCommands(client.application.id), {body: registry});
+                process.stdout.write(` Done. ${registry.length - res.length} errors.\n`);
+            } catch (error) {
+                console.error(error);
+            }
+        })();
+    }
+});

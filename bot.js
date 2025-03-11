@@ -4,7 +4,8 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildMessageReactions
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.MessageContent,
     ],
     partials: [Partials.GuildMember, Partials.Message, Partials.Reaction],
 });
@@ -23,8 +24,13 @@ const do_register = process.argv.includes("--register");
 const modulesPath = path.join(__dirname, "modules");
 
 // Load all modules in path
-for (const file of fs.readdirSync(modulesPath).filter(file => file.endsWith(".js"))) {
-    const exports = require(path.join(modulesPath, file))(client);
+for (const file of fs.readdirSync(modulesPath, {withFileTypes: true})) {
+    let path = file.parentPath + "/" + file.name;
+    if (file.isDirectory()) {
+        path += "/index.js";
+    }
+
+    const exports = require(path)(client);
 
     if (exports) {
         if ("commands" in exports) {
@@ -35,7 +41,7 @@ for (const file of fs.readdirSync(modulesPath).filter(file => file.endsWith(".js
         }
     }
 
-    console.log(`Loaded ${file}`);
+    console.log(`Loaded ${file.name}`);
 }
 
 // Listen for and respond to chat and context menu commands

@@ -12,5 +12,9 @@
             "https://tenor.com/view/the-simpsons-bart-simpson-whoops-go-in-and-out-gif-15009786",
             "$USERNAME didn't last long..."
         ]
+    },
+    "module_mediaonly": {
+        "channels": ["1234567890123456"],
+        "reply": "Your message was removed from $CHANNEL as it did not contain any media.\n\n$QUOTE"
     }
 }
